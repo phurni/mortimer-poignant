@@ -1,0 +1,22 @@
+{
+    "name": "mortimer/poignant",
+    "description": "Eloquent and Ardent on steroids, adds in-model validations, user stamping, declarative relations, cascaded operations on relations (save, delete). To make RoR devs feel a bit more at home.",
+    "keywords": ["validation", "laravel", "framework", "eloquent", "database", "ardent", "orm", "activerecord", "active record"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pascal Hurni",
+            "email": "phi@ruby-reactive.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": ">=4.2.6"
+    "autoload": {
+        "psr-4": {
+            "Mortimer\\Poignant\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

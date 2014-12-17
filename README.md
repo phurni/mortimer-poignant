@@ -3,6 +3,8 @@
 Eloquent on steroids, implements RoR like ActiveRecord features as traits, including in-model validations,
 user stamping, declarative relations, cascaded operations on relations (save, delete).
 
+The DeclarativeRelations is extracted from [Ardent](https://github.com/laravelbook/ardent) by Max Ehsan (see LICENSE_Ardent).
+
 Copyright (C) 2014 Pascal Hurni <[https://github.com/phurni](https://github.com/phurni)>
 
 Licensed under the [MIT License](http://opensource.org/licenses/MIT).
@@ -52,6 +54,9 @@ Here is the list of traits with their behaviours, you'll find the detailed docum
  * UserStamping
    Provides automatic filling of `create_by_id`, `updated_by_id` and `deleted_by_id` attributes.
 
+ * DeclarativeRelations
+   Eases the declaration of relationships with a property array.
+
 ### UserStamping
 
 Provides automatic filling of `create_by_id`, `updated_by_id` and `deleted_by_id` attributes.
@@ -76,6 +81,8 @@ class MyModel extends Eloquent {
 You may also override the value stored in those columns:
 
 ```php
+use Mortimer\Poignant\UserStamping;
+
 class MyModel extends Eloquent {
   use UserStamping;
   
@@ -86,4 +93,60 @@ class MyModel extends Eloquent {
   }
 }
 ```
+
+### DeclarativeRelations
+
+This one is extracted from Ardent which itself picked the idea from the Yii framework.
+
+Can be used to ease declaration of relationships in Eloquent models.
+Follows closely the behavior of the relation methods used by Eloquent, but packing them into an indexed array
+with relation constants make the code less cluttered.
+
+It should be declared with camel-cased keys as the relation name, and value being a mixed array with the
+relation constant being the first (0) value, the second (1) being the classname and the next ones (optionals)
+having named keys indicating the other arguments of the original methods: 'foreignKey' (belongsTo, hasOne,
+belongsToMany and hasMany); 'table' and 'otherKey' (belongsToMany only); 'name', 'type' and 'id' (specific for
+morphTo, morphOne and morphMany).
+Exceptionally, the relation type MORPH_TO does not include a classname, following the method declaration of
+`\Illuminate\Database\Eloquent\Model::morphTo`.
+
+Example:
+
+```php
+use Mortimer\Poignant\DeclarativeRelations;
+use Mortimer\Poignant\DeclarativeRelationsTypes as DRT;
+
+class Order extends Eloquent {
+    use DeclarativeRelations;
+    
+    protected static $relationsData = [
+        'items'    => [DRT::HAS_MANY, 'Item'],
+        'owner'    => [DRT::HAS_ONE, 'User', 'foreignKey' => 'user_id'],
+        'pictures' => [DRT::MORPH_MANY, 'Picture', 'name' => 'imageable']
+    ];
+}
+```
+
+Or by extending the base model (no more needs of DRT):
+
+```php
+use Mortimer\Poignant\Model;
+
+class Order extends Model {
+    use DeclarativeRelations;
+    
+    protected static $relationsData = [
+        'items'    => [self::HAS_MANY, 'Item'],
+        'owner'    => [self::HAS_ONE, 'User', 'foreignKey' => 'user_id'],
+        'pictures' => [self::MORPH_MANY, 'Picture', 'name' => 'imageable']
+    ];
+}
+```
+
+For fellow developers that want to pick the relations declaration from anywhere else than the `$relationsData` property,
+you simply have to override these three methods to accomodate for this:
+
+  * `protected static function getDeclaredRelations()`
+  * `protected static function getDeclaredRelationOptions($relationName)`
+  * `protected static function hasDeclaredRelation($relationName)`
 

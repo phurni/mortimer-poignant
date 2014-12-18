@@ -260,7 +260,7 @@ trait DeclarativeRelations {
         if ($attr === null) {
             $camelKey = camel_case($key);
             if (static::hasDeclaredRelation($camelKey)) {
-                return $this->relations[$key] = $this->$camelKey()->getResults();
+                return $this->getRelationshipFromMethod($key, $camelKey);
             }
         }
 

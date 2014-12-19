@@ -10,4 +10,5 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model {
     const MORPH_TO        = DeclarativeRelationsTypes::MORPH_TO;
     const MORPH_ONE       = DeclarativeRelationsTypes::MORPH_ONE;
     const MORPH_MANY      = DeclarativeRelationsTypes::MORPH_MANY;
+    const MORPH_TO_MANY   = DeclarativeRelationsTypes::MORPH_TO_MANY;
 }

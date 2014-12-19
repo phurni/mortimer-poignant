@@ -9,6 +9,7 @@ class DeclarativeRelationsTypes {
     const MORPH_TO        = 'morphTo';
     const MORPH_ONE       = 'morphOne';
     const MORPH_MANY      = 'morphMany';
+    const MORPH_TO_MANY   = 'morphToMany';
 }
 
 trait DeclarativeRelations {

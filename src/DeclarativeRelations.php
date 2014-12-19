@@ -51,6 +51,15 @@ trait DeclarativeRelations {
     protected static $relationsData = [];
 
     /**
+     * Associative array containing options the will be merged with every
+     * declared relation in the {@link $relationsData} array.
+     * This permits to set general default options easily.
+     *
+     * @var array
+     */
+    protected static $relationsDefaults = [];
+
+    /**
      * Array of relations used to verify arguments used in the {@link $relationsData}
      *
      * @var array
@@ -83,7 +92,7 @@ trait DeclarativeRelations {
      */
     protected static function getDeclaredRelationOptions($relationName)
     {
-        return static::$relationsData[$relationName];
+        return array_merge(static::$relationsDefaults, static::$relationsData[$relationName]);
     }
 
     /**

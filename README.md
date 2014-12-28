@@ -59,7 +59,9 @@ Here is the list of traits with their behaviours, you'll find the detailed docum
 
  * CascadedRelations
    Handles cascaded operations for relations. Notably save() and delete().
-
+   
+ * ModelValidation
+   Adds in-model validation and model scoped I18n for attributes and messages.
 
 ### UserStamping
 
@@ -157,4 +159,100 @@ you simply have to override these three methods to accomodate for this:
 ### CascadedRelations
 
 Handles cascaded operations for relations. Notably save() and delete().
+
+### ModelValidaton
+
+Import validation into the model. After all Eloquent is an ActiveRecord, so validating the record before saving is coherent.
+
+Now to the point. ModelValidation uses the `ValidatingTrait` by [Dwight Watson](https://github.com/dwightwatson/validating)
+but extends it so that custom validation rules may be defined **directly into the model**. Simply define the `validate*` and
+`replace*` methods directly in the model instead of the Validator class. You may also override the default `validate*`
+methods for your own use (always scoped to the model).
+
+Example:
+
+```php
+use Mortimer\Poignant\ModelValidation;
+
+class Booking extends Eloquent {
+    use ModelValidation;
+
+    protected $rules = [
+      'title' => 'required',
+      'starts_at' => 'required|date',
+      'ends_at' => 'required|date',
+      'items_ids' => 'required|required_with_all:starts_at,ends_at|available|array|min:1',
+    ];
+
+    protected $availableErrors = [];  // communication point between validateAvailable() and replaceAvailable()
+
+    public function validateAvailable($attribute, $value, $parameters, $validator)
+    {
+      // By default, we are valid
+      $available = true;
+      $this->availableErrors = [];
+
+      // Get the source of items either overridden ones or existing ones
+      $items_ids = $this->items_ids ? $this->items_ids : $this->items()->modelKeys();
+
+      // Fetch the possible conflicting bookings
+      $conflictingBookings = static::whereHas('items', function($query) use ($items_ids) { $query->whereIn('items.id', $items_ids);})->between($this->starts_at, $this->ends_at)->with('created_by')->get();
+
+      // Any conflict?
+      $available = $conflictingBookings->isEmpty();
+
+      // Inform the user we have conflicts
+      if (!$available) {
+        foreach ($conflictingBookings as $conflictingBooking) {
+          $this->availableErrors[] = \Lang::get('bookings/validation.items_ids.unavailable_item', [
+            'title'    => $conflictingBooking->title,
+            'resource' => $conflictingBooking->items->implode('name', ', '),
+            'from'     => $conflictingBooking->starts_at,
+            'to'       => $conflictingBooking->ends_at,
+            'user'     => $conflictingBooking->created_by->fullname]
+          );
+        }
+      }
+
+      return $available;
+    }
+
+    public function replaceAvailable($message, $attribute, $rule, $parameters)
+    {
+      return str_replace(':available', join("\n", $this->availableErrors), $message);
+    }
+}
+```
+
+This example shows that having your custom validate method leverages the fact that we are in the model because we
+use its `items` relation to fetch the possible conflicting bookings. Something that may be hard to achieve otherwise.
+
+Attributes and messages may be customized and localized automagically. Simply define locale files
+for the custom items you want. Here is an example for the `Booking` model defined above:
+
+`app/lang/en/bookings/attributes.php`
+
+```php
+<?php
+  return [
+    'title' => 'Title',
+    'starts_at' => 'From',
+    'ends_at' => 'To',
+    'whole_days' => 'Whole days',
+    'items' => 'Items'
+  ];
+```
+
+`app/lang/en/bookings/validation.php`
+
+```php
+<?php
+  return [
+    'items_ids.required' => "Please select at least one item.",
+    'items_ids.available' => "Conflicts:\n:available",
+    'items_ids.unavailable_item' => ":title [:resource] booked from :from to :to by :user"
+  ];
+```
+
+No need to polute the global `validation.php` file with model specific needs.
 

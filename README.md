@@ -51,16 +51,16 @@ class MyModel extends Model {
 
 Here is the list of traits with their behaviours, you'll find the detailed documentation in the next chapters.
 
- * UserStamping
+ * `UserStamping`.
    Provides automatic filling of `created_by_id`, `updated_by_id` and `deleted_by_id` attributes.
 
- * DeclarativeRelations
+ * `DeclarativeRelations`.
    Eases the declaration of relationships with a property array.
 
- * CascadedRelations
+ * `CascadedRelations`.
    Handles cascaded operations for relations. Notably save() and delete().
    
- * ModelValidation
+ * `ModelValidation`.
    Adds in-model validation and model scoped I18n for attributes and messages.
 
 ### UserStamping

@@ -150,3 +150,7 @@ you simply have to override these three methods to accomodate for this:
   * `protected static function getDeclaredRelationOptions($relationName)`
   * `protected static function hasDeclaredRelation($relationName)`
 
+### CascadedRelations
+
+Handles cascaded operations for relations. Notably save() and delete().
+

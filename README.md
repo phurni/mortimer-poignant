@@ -57,6 +57,10 @@ Here is the list of traits with their behaviours, you'll find the detailed docum
  * DeclarativeRelations
    Eases the declaration of relationships with a property array.
 
+ * CascadedRelations
+   Handles cascaded operations for relations. Notably save() and delete().
+
+
 ### UserStamping
 
 Provides automatic filling of `create_by_id`, `updated_by_id` and `deleted_by_id` attributes.

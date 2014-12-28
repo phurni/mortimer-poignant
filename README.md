@@ -52,7 +52,7 @@ class MyModel extends Model {
 Here is the list of traits with their behaviours, you'll find the detailed documentation in the next chapters.
 
  * UserStamping
-   Provides automatic filling of `create_by_id`, `updated_by_id` and `deleted_by_id` attributes.
+   Provides automatic filling of `created_by_id`, `updated_by_id` and `deleted_by_id` attributes.
 
  * DeclarativeRelations
    Eases the declaration of relationships with a property array.
@@ -65,7 +65,7 @@ Here is the list of traits with their behaviours, you'll find the detailed docum
 
 ### UserStamping
 
-Provides automatic filling of `create_by_id`, `updated_by_id` and `deleted_by_id` attributes.
+Provides automatic filling of `created_by_id`, `updated_by_id` and `deleted_by_id` attributes.
 These are filled only if the columns exists on the table, so no need to worry about using or not the trait,
 simply use and forget it.
 

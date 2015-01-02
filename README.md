@@ -169,6 +169,9 @@ but extends it so that custom validation rules may be defined **directly into th
 `replace*` methods directly in the model instead of the Validator class. You may also override the default `validate*`
 methods for your own use (always scoped to the model).
 
+Additional validations rules may also be declared in subclasses, the ModelValidation trait will gather rules in the whole
+class hierarchy.
+
 Example:
 
 ```php
@@ -177,7 +180,7 @@ use Mortimer\Poignant\ModelValidation;
 class Booking extends Eloquent {
     use ModelValidation;
 
-    protected $rules = [
+    protected static $rules = [
       'title' => 'required',
       'starts_at' => 'required|date',
       'ends_at' => 'required|date',

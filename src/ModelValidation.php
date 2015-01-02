@@ -8,6 +8,55 @@ trait ModelValidation {
     }
 
     /**
+     * Cached rules for the current model
+     *
+     * @var array
+     */
+    protected $_rules = null;
+
+    /**
+     * Get the global validation rules.
+     *
+     * @return array
+     */
+    public function getRules()
+    {
+        if ($this->_rules === null) {
+            $this->_rules = $this->getInheritedRules();
+        }
+        return $this->_rules;
+    }
+
+    /**
+     * Set the global validation rules.
+     *
+     * @param  array $rules
+     * @return void
+     */
+    public function setRules(array $rules = null)
+    {
+        $this->_rules = $rules;
+    }
+
+    /**
+     * Gather the validation rules from the whole class hierarchy.
+     *
+     * @return array
+     */
+    protected function getInheritedRules()
+    {
+        $classes = array_values(class_parents($this));
+        array_unshift($classes, get_called_class());
+        $rules = [];
+        foreach ($classes as $class) {
+            if (isset($class::$rules)) {
+                $rules = array_merge($class::$rules, $rules);
+            }
+        }
+        return $rules;
+    }
+
+    /**
      * Get the Validator instance. Note that the default implementation
      * will get the default Validator factory and inject our ModelValidator
      * by setting a new resolver, so if you already injected a resolver it will

@@ -149,12 +149,14 @@ class Order extends Model {
 }
 ```
 
-For fellow developers that want to pick the relations declaration from anywhere else than the `$relationsData` property,
-you simply have to override these three methods to accomodate for this:
+You may also add specific relationships in sub-classes, their parent relationships will be gathered
+automatically, no need for special care.
 
-  * `protected static function getDeclaredRelations()`
-  * `protected static function getDeclaredRelationOptions($relationName)`
-  * `protected static function hasDeclaredRelation($relationName)`
+For fellow developers that want to pick the relations declaration from anywhere else than the `$relationsData` property,
+you simply have to override these two methods to accomodate for this:
+
+  * `protected static function getDeclaredRelationships()`
+  * `protected static function getInheritedDeclaredRelationships()`
 
 ### CascadedRelations
 

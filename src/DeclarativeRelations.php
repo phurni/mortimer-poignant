@@ -72,41 +72,82 @@ trait DeclarativeRelations {
     ];
 
     /**
-     * Returns the names of the relations declared in the array {@link $relationsData}.
-     * This method, {@link getDeclaredRelationOptions} and {@link hasDeclaredRelation}
+     * Cached relationships for the different hierarchy levels. Internal.
+     *
+     * @var array
+     */
+    protected static $hierarchyRelationsData = [];
+
+    /**
+     * Returns and caches the gathered relations declared in the array {@link $relationsData}
+     * of the whole class hierarchy.
+     * This method and {@link getInheritedDeclaredRelationships}
      * are the only one to override if you want to fetch the relation data from another source.
+     *
+     * @return array
+     */
+    protected static function getDeclaredRelationships()
+    {
+        $self = get_called_class();
+        
+        if (!isset(static::$hierarchyRelationsData[$self])) {
+            static::$hierarchyRelationsData[$self] = static::getInheritedDeclaredRelationships();
+        }
+        
+        return static::$hierarchyRelationsData[$self];
+    }
+
+    /**
+     * Return the declarative relation options array, picked from {@link $relationsData}.
+     * This method and {@link getDeclaredRelationships}
+     * are the only one to override if you want to fetch the relation data from another source.
+     *
+     * @return array
+     */
+    protected static function getInheritedDeclaredRelationships()
+    {
+        $self = get_called_class();
+        $classes = array_values(class_parents($self));
+        array_unshift($classes, $self);
+        $relationsData = [];
+        foreach ($classes as $class) {
+            if (isset($class::$relationsData)) {
+                $relationsData = array_merge($class::$relationsData, $relationsData);
+            }
+        }
+        return $relationsData;
+    }
+
+    /**
+     * Returns the names of the relations declared in the array {@link $relationsData}.
      *
      * @return array
      */
     protected static function getDeclaredRelations()
     {
-        return array_keys(static::$relationsData);
+        return array_keys(static::getDeclaredRelationships());
     }
 
     /**
      * Return the declarative relation options array, picked from {@link $relationsData}.
-     * This method, {@link hasDeclaredRelation} and {@link getDeclaredRelations}
-     * are the only one to override if you want to fetch the relation data from another source.
      *
      * @param string $relationName the relation key, camel-case version
      * @return array
      */
     protected static function getDeclaredRelationOptions($relationName)
     {
-        return array_merge(static::$relationsDefaults, static::$relationsData[$relationName]);
+        return array_merge(static::$relationsDefaults, static::getDeclaredRelationships()[$relationName]);
     }
 
     /**
      * Checks for the existance of a relation in the declarative array {@link $relationsData}.
-     * This method, {@link getDeclaredRelationOptions} and  {@link getDeclaredRelations}
-     * are the only one to override if you want to fetch the relation data from another source.
      *
      * @param string $relationName the relation key, camel-case version
      * @return bool
      */
     protected static function hasDeclaredRelation($relationName)
     {
-        return array_key_exists($relationName, static::$relationsData);
+        return array_key_exists($relationName, static::getDeclaredRelationships());
     }
 
     /**

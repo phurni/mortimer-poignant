@@ -1,7 +1,7 @@
 <?php namespace Mortimer\Poignant;
 
 abstract class Model extends \Illuminate\Database\Eloquent\Model {
-    use ModelValidation, UserStamping, DeclarativeRelations, CascadedRelations;
+    use ModelValidation, UserStamping, DeclarativeRelations, CascadedRelations, ExistingAttributesPersistence;
     
     const HAS_ONE         = DeclarativeRelationsTypes::HAS_ONE;
     const HAS_MANY        = DeclarativeRelationsTypes::HAS_MANY;

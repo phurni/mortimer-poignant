@@ -63,6 +63,9 @@ Here is the list of traits with their behaviours, you'll find the detailed docum
  * `ModelValidation`.
    Adds in-model validation and model scoped I18n for attributes and messages.
 
+ * `ExistingAttributesPersistence`.
+   Automatically purge any attributes that are not DB columns before saving.
+
 ### UserStamping
 
 Provides automatic filling of `created_by_id`, `updated_by_id` and `deleted_by_id` attributes.
@@ -261,3 +264,29 @@ for the custom items you want. Here is an example for the `Booking` model define
 
 No need to polute the global `validation.php` file with model specific needs.
 
+### ExistingAttributesPersistence
+
+Already seen this:
+
+```php
+class SomeModel extends BaseModel {
+    protected $purgeable = [
+        'temporary_attribute',
+        'password_confirmation',
+    ];
+}
+```
+
+Then forget it, simply use the `ExistingAttributesPersistence` trait and tell nothing in
+your model classes. This trait will automatically remove any attributes that have no
+column counterpart on the DB table, before saving.
+
+How to use? use the trait, or put it in your `BaseModel`.
+
+```php
+use Mortimer\Poignant\ExistingAttributesPersistence;
+
+class SomeModel extends BaseModel {
+  use ExistingAttributesPersistence;
+}
+```

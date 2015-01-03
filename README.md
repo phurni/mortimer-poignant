@@ -5,7 +5,7 @@ user stamping, declarative relations, cascaded operations on relations (save, de
 
 The DeclarativeRelations is extracted from [Ardent](https://github.com/laravelbook/ardent) by Max Ehsan (see LICENSE_Ardent).
 
-Copyright (C) 2014 Pascal Hurni <[https://github.com/phurni](https://github.com/phurni)>
+Copyright (C) 2014-2015 Pascal Hurni <[https://github.com/phurni](https://github.com/phurni)>
 
 Licensed under the [MIT License](http://opensource.org/licenses/MIT).
 

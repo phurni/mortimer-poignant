@@ -68,7 +68,7 @@ trait UserStamping {
      * Add DB table columns meta info
      *
      */
-    public function getColumns() {
+    protected function getColumns() {
         return \DB::connection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
 
@@ -76,7 +76,7 @@ trait UserStamping {
      * Add DB table columns meta info
      *
      */
-    public function hasColumn($name) {
+    protected function hasColumn($name) {
         return in_array($name, $this->getColumns());
     }
 

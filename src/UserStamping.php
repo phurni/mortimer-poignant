@@ -26,17 +26,17 @@ trait UserStamping {
         $dummy = new static;
 
         // Audit user on creation
-        if ($dummy->hasColumn(static::$CREATED_BY) || $dummy->hasColumn(static::$UPDATED_BY)) {
+        if ($dummy->hasUserStampingTableColumn(static::$CREATED_BY) || $dummy->hasUserStampingTableColumn(static::$UPDATED_BY)) {
             $realCalledClass = get_called_class();  // BUG: the static keyword in closure returns the wrong called class, so pass it explicitely
             static::creating(function($model) use ($realCalledClass)
             {
-                if ($model->hasColumn($realCalledClass::$CREATED_BY)) $model->{$realCalledClass::$CREATED_BY} = $model->getUserStampValue();
-                if ($model->hasColumn($realCalledClass::$UPDATED_BY)) $model->{$realCalledClass::$UPDATED_BY} = $model->getUserStampValue();
+                if ($model->hasUserStampingTableColumn($realCalledClass::$CREATED_BY)) $model->{$realCalledClass::$CREATED_BY} = $model->getUserStampValue();
+                if ($model->hasUserStampingTableColumn($realCalledClass::$UPDATED_BY)) $model->{$realCalledClass::$UPDATED_BY} = $model->getUserStampValue();
             });
         }
 
         // Audit user when updating
-        if ($dummy->hasColumn(static::$UPDATED_BY)) {
+        if ($dummy->hasUserStampingTableColumn(static::$UPDATED_BY)) {
             $realCalledClass = get_called_class();  // BUG: the static keyword in closure returns the wrong called class, so pass it explicitely
             static::updating(function($model) use ($realCalledClass)
             {
@@ -45,7 +45,7 @@ trait UserStamping {
         }
 
         // Also audit user when soft deleting
-        if ($dummy->hasColumn(static::$DELETED_BY) && isset($dummy->forceDeleting)) {
+        if ($dummy->hasUserStampingTableColumn(static::$DELETED_BY) && isset($dummy->forceDeleting)) {
             $realCalledClass = get_called_class();  // BUG: the static keyword in closure returns the wrong called class, so pass it explicitely
             static::deleting(function($model) use ($realCalledClass)
             {
@@ -68,7 +68,7 @@ trait UserStamping {
      * Add DB table columns meta info
      *
      */
-    public function getColumns() {
+    protected function getUserStampingTableColumns() {
         return \DB::connection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
 
@@ -76,8 +76,8 @@ trait UserStamping {
      * Add DB table columns meta info
      *
      */
-    public function hasColumn($name) {
-        return in_array($name, $this->getColumns());
+    protected function hasUserStampingTableColumn($name) {
+        return in_array($name, $this->getUserStampingTableColumns());
     }
 
 }

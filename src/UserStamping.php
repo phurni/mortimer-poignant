@@ -2,11 +2,18 @@
 
 trait UserStamping {
 
+    /**
+     * Columns name.
+     *
+     * @var array
+     */
+    private $userStampingColumns = [];
+
     /** customizable constants for user audit **/
     protected static $CREATED_BY = 'created_by_id';
     protected static $UPDATED_BY = 'updated_by_id';
     protected static $DELETED_BY = 'deleted_by_id';
-    
+
     /**
      * Returns the value to put into the stamp attributes.
      * Defaults to \Auth::user()->getKey()
@@ -65,11 +72,16 @@ trait UserStamping {
     }
 
     /**
-     * Add DB table columns meta info
+     * Gets columns name of model's table.
      *
+     * @return  array
      */
     protected function getUserStampingTableColumns() {
-        return \DB::connection()->getSchemaBuilder()->getColumnListing($this->getTable());
+        if (!$this->userStampingColumns) {
+            $this->userStampingColumns = \DB::connection()->getSchemaBuilder()->getColumnListing($this->getTable());
+        }
+
+        return $this->userStampingColumns;
     }
 
     /**

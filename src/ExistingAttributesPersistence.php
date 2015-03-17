@@ -2,13 +2,6 @@
 
 trait ExistingAttributesPersistence {
 
-  /**
-   * Column names for the current model DB table
-   *
-   * @var array
-   */
-    protected static $ExistingAttributesPersistence_tableColumns = [];
-
     /**
      * Boot the trait for a model.
      *
@@ -18,14 +11,13 @@ trait ExistingAttributesPersistence {
     {
         // Register once for all, the existing attributes of the table
         $dummy = new static;
-        static::$ExistingAttributesPersistence_tableColumns = \DB::connection()->getSchemaBuilder()->getColumnListing($dummy->getTable());
-        
+        $existingAttributesPersistence_tableColumns = \DB::connection()->getSchemaBuilder()->getColumnListing($dummy->getTable());
+
         // Listen to the 'saving' event but with a low priority so that any validation is performed before purging the attributes
         $name = get_called_class();
-        static::getEventDispatcher()->listen("eloquent.saving: {$name}", function($model)
+        static::getEventDispatcher()->listen("eloquent.saving: {$name}", function($model) use ($existingAttributesPersistence_tableColumns)
         {
-            // Keep only the attributes that exists in the table
-            $model->setRawAttributes(array_only($model->getAttributes(), static::$ExistingAttributesPersistence_tableColumns));
+            $model->setRawAttributes(array_only($model->getAttributes(), $existingAttributesPersistence_tableColumns));
         }, -100);
     }
 }
